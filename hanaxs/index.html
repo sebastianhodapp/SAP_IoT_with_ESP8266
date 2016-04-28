@@ -1,0 +1,89 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta charset="UTF-8"/>
+        <title>ESP8266 Cloud & Highcharts JS</title>
+
+        <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+        <script src="https://code.highcharts.com/stock/highstock.js"></script>
+        <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+        
+        <script>
+            $(function () {
+                $.getJSON('https://s12hanaxs.hanatrial.ondemand.com/d043949trial/iotmmsxs/iotservice.xsodata/entityname?$format=json', function (data) {
+                    var results =  $(data)[0];
+            
+                    var tempData = [];
+                    var heatData = [];
+                    var humiData = [];
+
+                    $.each( results.d.results, function( key, val ) {
+                        var temp = []
+                        var humi = []
+                        var heat = []
+                
+                        temp.push(parseFloat(val['G_CREATED'].substring(6, 19)));
+                        humi.push(parseFloat(val['G_CREATED'].substring(6, 19)));
+                        heat.push(parseFloat(val['G_CREATED'].substring(6, 19)));
+                
+                        temp.push(parseFloat(val['C_TEMPERATURE']));
+                        humi.push(parseFloat(val['C_HUMIDITY']));
+                        heat.push(parseFloat(val['C_HEATINDEX']));
+
+                        tempData.push(temp);
+                        humiData.push(humi);
+                        heatData.push(heat);
+                }); 
+
+                    $('#container').highcharts('StockChart', {
+                        rangeSelector : {
+                            selected : 1
+                        },
+                        title : {
+                            text : 'Bedroom'
+                        },
+                        yAxis: [{
+    	    	            title: {
+	                            text: 'Temperature'
+    		                },
+	    	                height: 200,
+    	    	            lineWidth: 2
+	    	            }, {
+    		                title: {
+		                        text: 'Humidity'
+		                    },
+    		                top: 300,
+	        	            height: 200
+    	    	        }],
+		                series: [{
+		                    name: 'Temperature',
+    	    	            data: tempData,
+                            tooltip: {
+                                valueDecimals: 1
+                            }		        
+	    	            },
+    	        	    {
+        	    	        name: 'Heat Index',
+		                    data: heatData,
+                            tooltip: {
+                                valueDecimals: 1
+                            }		        
+            		    },
+	        	        {
+		                    name: 'Humidity',
+	    	                data: humiData,
+    		                yAxis: 1,
+		                    tooltip: {
+                                valueDecimals: 1
+                            }
+	    	            }]
+                    });
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <div id="container" style="height: 600px; min-width: 310px"></div>
+    </body>
+</html>
